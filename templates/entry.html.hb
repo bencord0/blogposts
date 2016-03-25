@@ -1,6 +1,3 @@
-{{#with entry}}
-    <h2><a href="/{{ slug }}/">{{ title }}</a></h2>
-    <h6>posted {{ date }} by <a href="/about/">Ben Cordero</a></h6>
-    {{ html }}
-{% endblock content %}
-{{/with}}
+    <h2><a href="/{{ entry.slug }}/">{{ entry.title }}</a></h2>
+    <h6>posted {{ entry.date }} by <a href="/about/">Ben Cordero</a></h6>
+    {{{ html }}}
