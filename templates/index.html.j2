@@ -1,3 +1,12 @@
+{% extends "base.html.j2" %}
+{% block title %}Fragments | Blog{% endblock title %}
+{% block nav %}
+<ul class="navbar-nav nav">
+  <li class="active"><a href="/">Home</a></li>
+</ul>
+{% endblock nav %}
+
+{% block content %}
     {% for entry in recent_entries %}
         <h2><a href="/{{ entry.slug }}/">{{ entry.title }}</a></h2>
         <h6>posted {{ entry.date }} by  <a href="/about/">Ben Cordero</a>.</h6>
@@ -6,3 +15,4 @@
             <p><a href="/{{ entry.slug }}/">Read more</a></p>
         </div>
     {% endfor %}
+{% endblock content %}
