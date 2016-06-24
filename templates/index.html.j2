@@ -9,7 +9,7 @@
 {% block content %}
     {% for entry in recent_entries %}
         <h2><a href="/{{ entry.slug }}/">{{ entry.title }}</a></h2>
-        <h6>posted {{ entry.date }} by  <a href="/about/">Ben Cordero</a>.</h6>
+        <h6>posted {{ entry.fuzzy_date }} by  <a href="/about/">Ben Cordero</a>.</h6>
         {{ entry.summary|safe }}
         <div>
             <p><a href="/{{ entry.slug }}/">Read more</a></p>
