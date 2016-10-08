@@ -34,6 +34,7 @@
                 {% block nav %}
                 <ul class="navbar-nav nav">
                     <li><a href="/">Home</a></li>
+                    <li><a href="/archive/">Archive</a></li>
                 </ul>
                 {% endblock nav %}
                 <p class="navbar-text vcenter">{% block navtext %}small, unrelated items. sometimes broken{% endblock %}</p>
@@ -58,6 +59,15 @@
                     <a href="/{{ entry.slug }}/">{{ entry.title }}</a>
                 </li>
                 {% endfor %}
+            </ul>
+            <h3>Feeds</h3>
+            <ul class="list-unstyled">
+              <li>
+                <a href="/feeds/atom/">Atom</a>
+              </li>
+              <li>
+                <a href="/feeds/rss/">RSS</a>
+              </li>
             </ul>
             {% endblock pane %}
         </div>
