@@ -1,0 +1,29 @@
+---
+version: '2'
+
+services:
+
+  web:
+    image: bencord0/blog
+    network_mode: "host"
+    depends_on:
+      - db
+    environment:
+      ALLOWED_HOSTS: "*"
+      DATABASE_URL: postgres://postgres:postgres@localhost/postgres
+
+  db:
+    image: postgres
+    network_mode: "host"
+
+  import:
+    image: bencord0/blog
+    network_mode: "host"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@localhost/postgres
+    entrypoint: /bin/sh
+    command: -c "sleep 3; blog manage migrate; blog manage import_entries /blogposts"
+    volumes:
+      - ".:/blogposts"
