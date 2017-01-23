@@ -5,25 +5,21 @@ services:
 
   web:
     image: bencord0/blog
-    network_mode: "host"
-    depends_on:
+    ports:
+      - 8000
+    links:
       - db
+    entrypoint: /bin/bash
+    command: ["-c", "blog manage migrate; blog manage import_entries /blogposts; blog"]
+    volumes:
+      - .:/blogposts
     environment:
+      DEBUG: 1
+      PORT: 8000
       ALLOWED_HOSTS: "*"
-      DATABASE_URL: postgres://postgres:postgres@localhost/postgres
+      DATABASE_URL: postgres://postgres:postgres@db/postgres
 
   db:
     image: postgres
-    network_mode: "host"
-
-  import:
-    image: bencord0/blog
-    network_mode: "host"
-    depends_on:
-      - db
-    environment:
-      DATABASE_URL: postgres://postgres:postgres@localhost/postgres
-    entrypoint: /bin/sh
-    command: -c "sleep 3; blog manage migrate; blog manage import_entries /blogposts"
-    volumes:
-      - ".:/blogposts"
+    ports:
+      - 5432
