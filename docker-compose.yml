@@ -6,7 +6,7 @@ services:
   web:
     image: bencord0/blog
     ports:
-      - 8000
+      - 8000:8000
     links:
       - db
     entrypoint: /bin/bash
