@@ -1,5 +1,3 @@
-3 Missing Pieces
-
 I'm still hesitant to jump into kubuernetes in production. Here are three blockers.
 
 ## Naked networking
