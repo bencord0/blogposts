@@ -6,14 +6,13 @@ I like the networking model, each pod has it's own IP.
 I don't like the overlay networking, Service/Ingress hacks, and that proprietary load balancers are required in essentially all deployments. Proprietary, or roll-your-own nginx-controled-by-python-loop stuff.
 
 This will be unblocked when I can write socket code that works whether or not I am inside the cluster.
-```
-import socket
-s = socket.socket(socket.AF_INET6)  # See socket.create_connection for the AF agnostic client code
-s.bind(("service", 0))
-s.listen(5)
-register_service_in_consul(s.getsockname())  # Or broadcast/multicast this to the network
-c, a = s.accept()
-```
+
+    import socket
+    s = socket.socket(socket.AF_INET6)  # See socket.create_connection for the AF agnostic client code
+    s.bind(("service", 0))
+    s.listen(5)
+    register_service_in_consul(s.getsockname())  # Or broadcast/multicast this to the network
+    c, a = s.accept()
 
 ## Deployment by branch
 
