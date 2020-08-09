@@ -6,20 +6,29 @@ services:
   web:
     image: bencord0/blog
     ports:
-      - 8000:8000
+      - 80:8000
     links:
       - db
-    entrypoint: /bin/bash
-    command: ["-c", "blog manage migrate; blog manage import_entries /blogposts; blog"]
-    volumes:
-      - .:/blogposts
     environment:
       DEBUG: 1
       PORT: 8000
       ALLOWED_HOSTS: "*"
       DATABASE_URL: postgres://postgres:postgres@db/postgres
 
+  importer:
+    image: bencord0/blog
+    links:
+      - db
+    volumes:
+      - .:/blogposts
+    entrypoint: [ "pipenv", "run" ]
+    command: ["bash", "-c", "blog manage migrate; blog manage import_entries /blogposts;"]
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db/postgres
+
   db:
     image: postgres
     ports:
       - 5432
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
