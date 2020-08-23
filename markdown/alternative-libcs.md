@@ -1,5 +1,3 @@
-# Alternative libcs
-
 tl;dr: How I setup the musl compiler toolchain on a glibc system
 
 ```bash
@@ -10,7 +8,7 @@ bencord0@localhost ~ $ eselect profile list|grep '*'
 If I compile a program with the system compiler, I get an ELF binary for an amd64 linux system linked against GNU's glibc. I'll refer to these as `x86_64-pc-linux-gnu`.
 
 ```bash
-$ cat main.c 
+$ cat main.c
 #include <stdio.h>
 int main()
 {
@@ -21,7 +19,7 @@ $ make CC=cc main
 cc     main.c   -o main
 $ readelf -h main
 ELF Header:
-  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00 
+  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00
   Class:                             ELF64
   Data:                              2's complement, little endian
   Version:                           1 (current)
@@ -81,7 +79,7 @@ $ make CC=x86_64-pc-linux-musl-gcc CFLAGS=-static main
 x86_64-pc-linux-musl-gcc -static    main.c   -o main
 $ readelf -h main
 ELF Header:
-  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00 
+  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00
   Class:                             ELF64
   Data:                              2's complement, little endian
   Version:                           1 (current)
@@ -125,7 +123,7 @@ Additionaly, a prefix is setup under `/usr/x86_64-pc-linux-musl/` where you can 
 ```bash
 $ ldd /usr/x86_64-pc-linux-musl/usr/bin/coreutils
 /usr/x86_64-pc-linux-musl/usr/bin/coreutils: error while loading shared libraries: /usr/lib64/libc.so: invalid ELF header
-$ x86_64-pc-linux-musl-ldd /usr/x86_64-pc-linux-musl/usr/bin/coreutils 
+$ x86_64-pc-linux-musl-ldd /usr/x86_64-pc-linux-musl/usr/bin/coreutils
         /lib/ld-musl-x86_64.so.1 (0x7fc051bdd000)
         libc.so => /lib/ld-musl-x86_64.so.1 (0x7fc051bdd000)
 ```
@@ -137,7 +135,7 @@ Since I'm using `glibc` as my main libc and `musl` is only installed to the pref
 ```bash
 $ make CC=x86_64-pc-linux-musl-gcc main
 x86_64-pc-linux-musl-gcc     main.c   -o main
-$ ./main 
+$ ./main
 -bash: ./main: No such file or directory
 ```
 
@@ -148,7 +146,7 @@ The [crossdev](https://wiki.gentoo.org/wiki/Crossdev) and [eprefix](https://wiki
 There are two more wrappers, symlinks really, that I use in addition to the toolchain wrappers.
 
 ```bash
-$ ls -l /usr/bin/x86_64-pc-linux-musl-ldd /lib/ld-musl-x86_64.so.1 
+$ ls -l /usr/bin/x86_64-pc-linux-musl-ldd /lib/ld-musl-x86_64.so.1
     /lib/ld-musl-x86_64.so.1          -> /usr/x86_64-pc-linux-musl/usr/lib/libc.so
     /usr/bin/x86_64-pc-linux-musl-ldd -> /usr/x86_64-pc-linux-musl/usr/bin/ldd
 ```
