@@ -1,51 +1,47 @@
 tl;dr: How I setup the musl compiler toolchain on a glibc system
 
-```bash
-bencord0@localhost ~ $ eselect profile list|grep '*'
-  [24]  default/linux/amd64/17.1/desktop/plasma/systemd (stable) *
-```
+    bencord0@localhost ~ $ eselect profile list|grep '*'
+      [24]  default/linux/amd64/17.1/desktop/plasma/systemd (stable) *
 
 If I compile a program with the system compiler, I get an ELF binary for an amd64 linux system linked against GNU's glibc. I'll refer to these as `x86_64-pc-linux-gnu`.
 
-```bash
-$ cat main.c
-#include <stdio.h>
-int main()
-{
-    printf("Hello World!\n");
-    return 0;
-}
-$ make CC=cc main
-cc     main.c   -o main
-$ readelf -h main
-ELF Header:
-  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00
-  Class:                             ELF64
-  Data:                              2's complement, little endian
-  Version:                           1 (current)
-  OS/ABI:                            UNIX - System V
-  ABI Version:                       0
-  Type:                              DYN (Shared object file)
-  Machine:                           Advanced Micro Devices X86-64
-  Version:                           0x1
-  Entry point address:               0x1050
-  Start of program headers:          64 (bytes into file)
-  Start of section headers:          14272 (bytes into file)
-  Flags:                             0x0
-  Size of this header:               64 (bytes)
-  Size of program headers:           56 (bytes)
-  Number of program headers:         11
-  Size of section headers:           64 (bytes)
-  Number of section headers:         29
-  Section header string table index: 28
-$ patchelf --print-interpreter main
-/lib64/ld-linux-x86-64.so.2
-$ ldd main
-        linux-vdso.so.1 (0x00007ffcb41ee000)
-        libc.so.6 => /lib64/libc.so.6 (0x00007fbc234d2000)
-        /lib64/ld-linux-x86-64.so.2 (0x00007fbc236ca000)
+    $ cat main.c
+    #include <stdio.h>
+    int main()
+    {
+        printf("Hello World!\n");
+        return 0;
+    }
+    $ make CC=cc main
+    cc     main.c   -o main
+    $ readelf -h main
+    ELF Header:
+      Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00
+      Class:                             ELF64
+      Data:                              2's complement, little endian
+      Version:                           1 (current)
+      OS/ABI:                            UNIX - System V
+      ABI Version:                       0
+      Type:                              DYN (Shared object file)
+      Machine:                           Advanced Micro Devices X86-64
+      Version:                           0x1
+      Entry point address:               0x1050
+      Start of program headers:          64 (bytes into file)
+      Start of section headers:          14272 (bytes into file)
+      Flags:                             0x0
+      Size of this header:               64 (bytes)
+      Size of program headers:           56 (bytes)
+      Number of program headers:         11
+      Size of section headers:           64 (bytes)
+      Number of section headers:         29
+      Section header string table index: 28
+    $ patchelf --print-interpreter main
+    /lib64/ld-linux-x86-64.so.2
+    $ ldd main
+            linux-vdso.so.1 (0x00007ffcb41ee000)
+            libc.so.6 => /lib64/libc.so.6 (0x00007fbc234d2000)
+            /lib64/ld-linux-x86-64.so.2 (0x00007fbc236ca000)
 
-```
 
 This coupling, of programs that run using the Linux kernel with help from the GNU userland libraries is commonly known as the [GNU/Linux System](https://www.gnu.org/gnu/linux-and-gnu.en.html). In the Free Software world, this is quite an acheivement that we shouldn't take for granted. Most significantly, is that everyone has access to the source code for this System and we can build self-hosting, self-compiling instances of the System without a reliance on proprietary vendors, NDAs and other secrets.
 
@@ -74,70 +70,60 @@ On Linux, there is even a whole ecosystem of [libc implementations](https://wiki
 
 Musl is a reasonalby complete, lightweight libc that has a particular niche in the world for small, portable, statically compiled binaries.
 
-```bash
-$ make CC=x86_64-pc-linux-musl-gcc CFLAGS=-static main
-x86_64-pc-linux-musl-gcc -static    main.c   -o main
-$ readelf -h main
-ELF Header:
-  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00
-  Class:                             ELF64
-  Data:                              2's complement, little endian
-  Version:                           1 (current)
-  OS/ABI:                            UNIX - System V
-  ABI Version:                       0
-  Type:                              EXEC (Executable file)
-  Machine:                           Advanced Micro Devices X86-64
-  Version:                           0x1
-  Entry point address:               0x40102b
-  Start of program headers:          64 (bytes into file)
-  Start of section headers:          21136 (bytes into file)
-  Flags:                             0x0
-  Size of this header:               64 (bytes)
-  Size of program headers:           56 (bytes)
-  Number of program headers:         6
-  Size of section headers:           64 (bytes)
-  Number of section headers:         15
-  Section header string table index: 14
-$ patchelf --print-interpreter main
-patchelf: cannot find section '.interp'. The input file is most likely statically linked
-$ ldd main
-        not a dynamic executable
-$ ls -lh main
--rwxr-xr-x 1 bencord0 bencord0 22K Aug 23 13:05 main
-```
+    $ make CC=x86_64-pc-linux-musl-gcc CFLAGS=-static main
+    x86_64-pc-linux-musl-gcc -static    main.c   -o main
+    $ readelf -h main
+    ELF Header:
+      Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00
+      Class:                             ELF64
+      Data:                              2's complement, little endian
+      Version:                           1 (current)
+      OS/ABI:                            UNIX - System V
+      ABI Version:                       0
+      Type:                              EXEC (Executable file)
+      Machine:                           Advanced Micro Devices X86-64
+      Version:                           0x1
+      Entry point address:               0x40102b
+      Start of program headers:          64 (bytes into file)
+      Start of section headers:          21136 (bytes into file)
+      Flags:                             0x0
+      Size of this header:               64 (bytes)
+      Size of program headers:           56 (bytes)
+      Number of program headers:         6
+      Size of section headers:           64 (bytes)
+      Number of section headers:         15
+      Section header string table index: 14
+    $ patchelf --print-interpreter main
+    patchelf: cannot find section '.interp'. The input file is most likely statically linked
+    $ ldd main
+            not a dynamic executable
+    $ ls -lh main
+    -rwxr-xr-x 1 bencord0 bencord0 22K Aug 23 13:05 main
 
 On Gentoo, it's reasonably easy to setup a cross-compiling toolchain.
 
-```bash
-# crossdev -t x86_64-pc-linux-musl -S
-```
+    # crossdev -t x86_64-pc-linux-musl -S
 
 This creates a gcc toolchain, which runs on `x86_64-pc-linux-gnu` to create `x86_64-pc-linux-musl` binaries.
 
-```bash
-/usr/x86_64-pc-linux-gnu/x86_64-pc-linux-musl/gcc-bin/9.3.0/x86_64-pc-linux-musl-gcc
-```
+    /usr/x86_64-pc-linux-gnu/x86_64-pc-linux-musl/gcc-bin/9.3.0/x86_64-pc-linux-musl-gcc
 
 Additionaly, a prefix is setup under `/usr/x86_64-pc-linux-musl/` where you can find binaries and libraries specifically linked against `musl`. You need to use toolchain specific programs to use and analyze them.
 
-```bash
-$ ldd /usr/x86_64-pc-linux-musl/usr/bin/coreutils
-/usr/x86_64-pc-linux-musl/usr/bin/coreutils: error while loading shared libraries: /usr/lib64/libc.so: invalid ELF header
-$ x86_64-pc-linux-musl-ldd /usr/x86_64-pc-linux-musl/usr/bin/coreutils
-        /lib/ld-musl-x86_64.so.1 (0x7fc051bdd000)
-        libc.so => /lib/ld-musl-x86_64.so.1 (0x7fc051bdd000)
-```
+    $ ldd /usr/x86_64-pc-linux-musl/usr/bin/coreutils
+    /usr/x86_64-pc-linux-musl/usr/bin/coreutils: error while loading shared libraries: /usr/lib64/libc.so: invalid ELF header
+    $ x86_64-pc-linux-musl-ldd /usr/x86_64-pc-linux-musl/usr/bin/coreutils
+            /lib/ld-musl-x86_64.so.1 (0x7fc051bdd000)
+            libc.so => /lib/ld-musl-x86_64.so.1 (0x7fc051bdd000)
 
 ## Sharing the host
 
 Since I'm using `glibc` as my main libc and `musl` is only installed to the prefix, dynamic binaries would not work.
 
-```bash
-$ make CC=x86_64-pc-linux-musl-gcc main
-x86_64-pc-linux-musl-gcc     main.c   -o main
-$ ./main
--bash: ./main: No such file or directory
-```
+    $ make CC=x86_64-pc-linux-musl-gcc main
+    x86_64-pc-linux-musl-gcc     main.c   -o main
+    $ ./main
+    -bash: ./main: No such file or directory
 
 Which is a fun error to get, since `./main` is definitely a file and it does exist there. The quirk to keep in mind is that Linux "interprets" dynamic ELF binaries with _another_ program.
 
@@ -145,11 +131,9 @@ The [crossdev](https://wiki.gentoo.org/wiki/Crossdev) and [eprefix](https://wiki
 
 There are two more wrappers, symlinks really, that I use in addition to the toolchain wrappers.
 
-```bash
-$ ls -l /usr/bin/x86_64-pc-linux-musl-ldd /lib/ld-musl-x86_64.so.1
-    /lib/ld-musl-x86_64.so.1          -> /usr/x86_64-pc-linux-musl/usr/lib/libc.so
-    /usr/bin/x86_64-pc-linux-musl-ldd -> /usr/x86_64-pc-linux-musl/usr/bin/ldd
-```
+    $ ls -l /usr/bin/x86_64-pc-linux-musl-ldd /lib/ld-musl-x86_64.so.1
+        /lib/ld-musl-x86_64.so.1          -> /usr/x86_64-pc-linux-musl/usr/lib/libc.so
+        /usr/bin/x86_64-pc-linux-musl-ldd -> /usr/x86_64-pc-linux-musl/usr/bin/ldd
 
 On a pure musl system, it would be normal to expect the ELF Interpreter to reside at `/lib/ld-musl-x86_64.so.1`. This is the `musl` analogue to `glibc`'s `/lib/ld-linux.so.2`. This can be resolved with a symlink into the prefix.
 
